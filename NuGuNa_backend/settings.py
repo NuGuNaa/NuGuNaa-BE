@@ -20,7 +20,8 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # file 저장
-FILE_DIRECTORY = BASE_DIR / '..' / 'files'
+FILE_ROOT = os.path.join(BASE_DIR, 'files')
+FILE_URL = '/files/'
 
 # api key 관련
 load_dotenv(os.path.join(BASE_DIR, '.env'))

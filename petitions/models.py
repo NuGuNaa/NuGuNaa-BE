@@ -6,7 +6,7 @@ class Petition_Detail(models.Model):
     APPROVER = models.CharField(max_length=30, null=False, blank=False)
     CURR_COMMITTEE = models.CharField(max_length=30, null=False, blank=False)
     LINK_URL = models.CharField(max_length=255, null=False, blank=False)
-    petition_file = models.FileField()
+    petition_file = models.FileField(upload_to="")
     
     def __str__(self):
         return self.BILL_NO
