@@ -8,6 +8,10 @@ from .models import *
 from django.utils.dateparse import parse_date
 
 
+# petition_file 파일 다운로드 가능하도록 함수 추가로 설정 필요
+# content 다운로드 받은 파일의 요약을 chat gpt에게 생성해달라 요청
+
+
 # api 응답 데이터 db에 저장
 def save_api_data_to_db(api_response, endpoint):
     for item in api_response[endpoint][1]['row']:
@@ -18,7 +22,6 @@ def save_api_data_to_db(api_response, endpoint):
                 'APPROVER': item['APPROVER'],
                 'CURR_COMITTEE': item['CURR_COMITTEE'],
                 'LINK_URL': item['LINK_URL'],
-                # petition_file 파일 다운로드 가능하도록 함수 추가로 설정 필요
             }
         )
         
@@ -27,10 +30,10 @@ def save_api_data_to_db(api_response, endpoint):
             BILL_NO = petition_detail,
             defaults={
                 'BILL_NAME': item['BILL_NAME'],
+                'file_bill_no': Petition.BILL_NO,
                 'PROPOSER': item['PROPOSER'],
                 'PROPOSER_DT': parse_date(item['PROPOSE_DT']),
                 'COMMITTEE_DT': parse_date(item['COMMITTEE_DT']),
-                'content': '' # content 다운로드 받은 파일의 요약을 chat gpt에게 생성해달라 요청
             }
         )
 
