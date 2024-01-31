@@ -4,7 +4,7 @@ from accounts.models import User
 
 
 class UserCheck(UserAdmin):
-    list_display = ('email', 'user_name', 'is_staff', 'is_active')
+    list_display = ('email', 'user_name', 'petition_id', 'is_staff', 'is_active')
     list_filter = ('is_active', 'is_staff', 'is_superuser', 'date_joined')
     search_fields = ('email', 'user_name')
     ordering = ('-date_joined',)

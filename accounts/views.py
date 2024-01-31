@@ -58,7 +58,7 @@ class LoginAPIView(APIView):
                     "user_name": serializer.data['user_name'],
                     "token": {
                         "access": access_token
-                    }
+                    },
                 },
                 status=status.HTTP_200_OK
             )
