@@ -13,24 +13,29 @@ from django.utils.dateparse import parse_date
 
 
 # api 응답 데이터 db에 저장
-def save_api_data_to_db(api_response, endpoint):
-    for item in api_response[endpoint][1]['row']:
+def save_api_data_to_db(api_data, endpoint):
+    for item in api_data[endpoint][1]['row']:
         # Petition_Detail 모델 업데이트 또는 생성
         petition_detail, created = Petition_Detail.objects.update_or_create(
             BILL_NO = item['BILL_NO'],
             defaults={
                 'APPROVER': item['APPROVER'],
-                'CURR_COMITTEE': item['CURR_COMITTEE'],
+                'CURR_COMMITTEE': item['CURR_COMMITTEE'],
                 'LINK_URL': item['LINK_URL'],
             }
         )
         
         # Petition 모델 업데이트 또는 생성
+        try:
+            petition_file_instance = Petition_File.objects.get(BILL_NO=petition_detail.BILL_NO)
+        except Petition_File.DoesNotExist:
+            petition_file_instance = Petition_File.objects.create(BILL_NO=petition_detail.BILL_NO)
+        
         Petition.objects.update_or_create(
             BILL_NO = petition_detail,
             defaults={
                 'BILL_NAME': item['BILL_NAME'],
-                'file_bill_no': Petition.BILL_NO,
+                'file_bill_no': petition_file_instance,
                 'PROPOSER': item['PROPOSER'],
                 'PROPOSER_DT': parse_date(item['PROPOSE_DT']),
                 'COMMITTEE_DT': parse_date(item['COMMITTEE_DT']),
@@ -53,4 +58,5 @@ def call_national_assembly_api(endpoint, additional_params=None):
         params.update(additional_params) # 추가 파라미터가 있으면 병합
         
     api_response = requests.get(f"{base_url}/{endpoint}", params=params)
-    save_api_data_to_db(api_response, endpoint)
+    api_data = api_response.json()
+    save_api_data_to_db(api_data, endpoint)
