@@ -15,9 +15,20 @@ from django.utils.dateparse import parse_date
 # api 응답 데이터 db에 저장
 def save_api_data_to_db(api_data, endpoint):
     for item in api_data[endpoint][1]['row']:
-        # Petition_Detail 모델 업데이트 또는 생성
-        petition_detail, created = Petition_Detail.objects.update_or_create(
+        # Petition 모델 업데이트 또는 생성
+        petition, created = Petition.objects.update_or_create(
             BILL_NO = item['BILL_NO'],
+            defaults={
+                'BILL_NAME': item['BILL_NAME'],
+                'PROPOSER': item['PROPOSER'],
+                'PROPOSER_DT': parse_date(item['PROPOSE_DT']),
+                'COMMITTEE_DT': parse_date(item['COMMITTEE_DT']),
+            }
+        )
+        
+        # Petition_Detail 모델 업데이트 또는 생성
+        Petition_Detail.objects.update_or_create(
+            BILL_NO = petition,
             defaults={
                 'APPROVER': item['APPROVER'],
                 'CURR_COMMITTEE': item['CURR_COMMITTEE'],
@@ -25,22 +36,11 @@ def save_api_data_to_db(api_data, endpoint):
             }
         )
         
-        # Petition 모델 업데이트 또는 생성
-        try:
-            petition_file_instance = Petition_File.objects.get(BILL_NO=petition_detail.BILL_NO)
-        except Petition_File.DoesNotExist:
-            petition_file_instance = Petition_File.objects.create(BILL_NO=petition_detail.BILL_NO)
-        
-        Petition.objects.update_or_create(
-            BILL_NO = petition_detail,
-            defaults={
-                'BILL_NAME': item['BILL_NAME'],
-                'file_bill_no': petition_file_instance,
-                'PROPOSER': item['PROPOSER'],
-                'PROPOSER_DT': parse_date(item['PROPOSE_DT']),
-                'COMMITTEE_DT': parse_date(item['COMMITTEE_DT']),
-            }
+        # Petition_File 모델 업데이트 또는 생성
+        Petition_File.objects.update_or_create(
+            BILL_NO = petition
         )
+
 
 
 # api에서 데이터 읽어오기
@@ -51,7 +51,8 @@ def call_national_assembly_api(endpoint, additional_params=None):
     params = {
         'key': api_key,
         'Type': 'json',
-        'pSize': 5
+        'pIndex': 1,
+        'pSize': 30,
     }
     
     if additional_params:
