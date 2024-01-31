@@ -57,6 +57,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(_('staff_status'), default=False)
     is_superuser = models.BooleanField(_('superuser_status'), default=False)
     
+    # 추가 정보(토론 참가 시)
+    petition_id = models.IntegerField(null=True, blank=True)
+    
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['user_name']
     
