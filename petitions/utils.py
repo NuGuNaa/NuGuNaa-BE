@@ -39,8 +39,8 @@ def save_api_data_to_db(api_data, endpoint):
         # Petition_File 모델 업데이트 또는 생성
         Petition_File.objects.update_or_create(
             BILL_NO = petition
+            # 나머지 정보
         )
-
 
 
 # api에서 데이터 읽어오기
