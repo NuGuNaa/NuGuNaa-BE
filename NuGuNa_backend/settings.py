@@ -18,6 +18,11 @@ from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# file 저장
+FILE_DIRECTORY = BASE_DIR / '..' / 'files'
+
+# api key 관련
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 PUBLIC_API_KEY = os.getenv("PUBLIC_API_KEY")
@@ -51,6 +56,7 @@ INSTALLED_APPS = [
     
     # 생성한 앱
     'accounts',
+    'petitions',
 ]
 
 MIDDLEWARE = [
@@ -100,7 +106,6 @@ WSGI_APPLICATION = 'NuGuNa_backend.wsgi.application'
 
 # accounts 앱에서 설정한 User 사용하겠다 선언
 AUTH_USER_MODEL = 'accounts.User'
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -159,7 +164,6 @@ REST_FRAMEWORK = {
 		'rest_framework.permissions.AllowAny',
     )
 }
-
 
 # jwt token 설정
 SIMPLE_JWT = {
