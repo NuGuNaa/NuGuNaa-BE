@@ -71,3 +71,21 @@ class LoginAPIView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+            
+            
+# 로그아웃
+class LogoutAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    
+    # 로그아웃
+    def delete(self, request):
+        # 쿠키에 저장된 토큰 삭제 -> 로그아웃
+        res = Response(
+            {
+                "message": "로그아웃되었습니다."
+            },
+            status=status.HTTP_202_ACCEPTED
+        )
+        res.delete_cookie("access")
+        return res
