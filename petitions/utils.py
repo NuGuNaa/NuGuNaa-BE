@@ -9,7 +9,7 @@ from .models import *
 from django.utils.dateparse import parse_date
 
 
-# petition_file 파일 다운로드 가능하도록 함수 추가로 설정 필요
+# petition_file 파일 경로 확인
 def save_file_path(bill_no):
     directory_path = settings.FILE_ROOT
     petition_instance = Petition.objects.get(BILL_NO=bill_no)
