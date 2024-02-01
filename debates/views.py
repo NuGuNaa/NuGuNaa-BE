@@ -16,7 +16,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # 기타 계산 관련
 from datetime import timedelta
-import random
+from .utils import *
 
 
 # 토론 기본 정보 등록하기(백엔드에서 미리 작업)
@@ -50,18 +50,7 @@ class DebateCreateAPIView(APIView):
         member_announcement_date = petition.COMMITTEE_DT + timedelta(days=5)
         debate_date = petition.COMMITTEE_DT + timedelta(days=15)
         
-        # 찬성측, 반대측 코드 추출
-        def generate_unique_codes():
-            while True:
-                code_O = str(random.randint(10000, 99999))
-                code_X = str(random.randint(10000, 99999))
-                
-                # 찬성, 반대측 코드가 서로 다르고, 데이터베이스에도 존재하지 않는지 확인
-                if code_O != code_X and not \
-                    Debate.objects.filter(debate_code_O=code_O).exists() and not \
-                    Debate.objects.filter(debate_code_X=code_X).exists():
-                        return code_O, code_X
-                
+        # 찬성측, 반대측 코드 추출                
         debate_code_O, debate_code_X = generate_unique_codes()
         
         # 토론 정보 자동 생성
