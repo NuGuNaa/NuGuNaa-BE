@@ -9,7 +9,7 @@ class PetitionFileSerializer(serializers.ModelSerializer):
         
 
 class PetitionSerializer(serializers.ModelSerializer):
-    petition_file = PetitionFileSerializer(source='petition_file', read_only=True)
+    petition_file = PetitionFileSerializer(read_only=True)
     
     class Meta:
         model = Petition
@@ -17,7 +17,7 @@ class PetitionSerializer(serializers.ModelSerializer):
         
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        if 'petition_ifle' in representation and representation['petition_file'] is not None:
+        if 'petition_file' in representation and representation['petition_file'] is not None:
             content = representation['petition_file'].get('content')
             representation['petition_file'] = {'content': content}
         return representation
