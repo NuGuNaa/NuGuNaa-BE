@@ -24,8 +24,8 @@ class Petition_Detail(models.Model):
     
 class Petition_File(models.Model):
     BILL_NO = models.OneToOneField(Petition, primary_key=True, null=False, blank=False, on_delete=models.CASCADE)
-    petition_file = models.FileField(upload_to="")
-    content = models.TextField(null=False)
+    petition_file_url = models.CharField(max_length=100, null=True, blank=False)
+    content = models.TextField(null=True)
     
     def __str__(self):
         return self.content
