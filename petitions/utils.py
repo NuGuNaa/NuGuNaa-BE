@@ -1,3 +1,4 @@
+import os
 import requests
 
 # api key 활용
@@ -8,7 +9,21 @@ from .models import *
 from django.utils.dateparse import parse_date
 
 
-# petition_file 파일 다운로드 가능하도록 함수 추가로 설정 필요
+# petition_file 파일 경로 확인
+def save_file_path(bill_no):
+    directory_path = settings.FILE_ROOT
+    petition_instance = Petition.objects.get(BILL_NO=bill_no)
+    
+    for filename in os.listdir(directory_path):
+        if str(bill_no) in filename:
+            file_path = os.path.join(settings.FILE_URL, filename)
+            Petition_File.objects.update_or_create(
+                BILL_NO=petition_instance,
+                defaults={'petition_file_url': file_path}
+            )
+            break
+        
+
 # content 다운로드 받은 파일의 요약을 chat gpt에게 생성해달라 요청
 
 
@@ -37,10 +52,7 @@ def save_api_data_to_db(api_data, endpoint):
         )
         
         # Petition_File 모델 업데이트 또는 생성
-        Petition_File.objects.update_or_create(
-            BILL_NO = petition,
-            
-        )
+        save_file_path(item['BILL_NO'])
 
 
 # api에서 데이터 읽어오기

@@ -33,7 +33,21 @@ class PetitionListAPIView(APIView):
         
         if page is not None:
             serializer = PetitionSerializer(page, many=True)
-            return paginator.get_paginated_response(serializer.data)
+            data = self.filtering_data(serializer.data)
+            return paginator.get_paginated_response(data)
         
         serializer = PetitionSerializer(petitions, many=True)
-        return Response(serializer.data)
+        data = self.filtering_data(serializer.data)
+        return Response(data)
+    
+    def filtering_data(self, data):
+        filtered_data = []
+            
+        for item in data:
+            filtered_data.append({
+                'BILL_NAME': item['BILL_NAME'],
+                'PROPOSER': item['PROPOSER'],
+                'PROPOSER_DT': item['PROPOSER_DT'],
+                'content': item.get('petition_file', {}).get('content', '')
+            })
+        return filtered_data
