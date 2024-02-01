@@ -8,18 +8,20 @@ from django.conf import settings
 from .models import *
 from django.utils.dateparse import parse_date
 
+# url 찾기
+from .file_urls import file_urls
+
 
 # petition_file 파일 경로 확인
 def save_file_path(bill_no):
-    directory_path = settings.FILE_ROOT
     petition_instance = Petition.objects.get(BILL_NO=bill_no)
     
-    for filename in os.listdir(directory_path):
-        if str(bill_no) in filename:
-            file_path = os.path.join(settings.FILE_URL, filename)
+    for url in file_urls:
+        url = url.strip()
+        if str(bill_no) in url:
             Petition_File.objects.update_or_create(
                 BILL_NO=petition_instance,
-                defaults={'petition_file_url': file_path}
+                defaults={'petition_file_url': url}
             )
             break
         
