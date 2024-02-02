@@ -15,7 +15,7 @@ from rest_framework import permissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # 기타 계산 관련
-from datetime import timedelta
+from datetime import timedelta, datetime
 from .utils import *
 
 
@@ -47,8 +47,8 @@ class DebateCreateAPIView(APIView):
             status=status.HTTP_400_BAD_REQUEST)
         
         # 날짜 계산
-        member_announcement_date = petition.COMMITTEE_DT + timedelta(days=5)
-        debate_date = petition.COMMITTEE_DT + timedelta(days=15)
+        member_announcement_date = petition.COMMITTEE_DT + timedelta(days=10)
+        debate_date = petition.COMMITTEE_DT + timedelta(days=30)
         
         # 찬성측, 반대측 코드 추출                
         debate_code_O, debate_code_X = generate_unique_codes()
@@ -62,13 +62,19 @@ class DebateCreateAPIView(APIView):
             debate_code_X=debate_code_X
         )
         
+        # 디데이 계산
+        current_date = datetime.now().date()
+        d_day = (debate.debate_date - current_date).days
+        
+        
         res = Response({
             "member_announcement_date": debate.member_announcement_date,
             "debate_date": debate.debate_date,
             "estimated_time": debate.estimated_time,
             "debate_code_O": debate.debate_code_O,
             "debate_code_X": debate.debate_code_X,
-            "petition_id": debate.petition_id.pk
+            "petition_id": debate.petition_id.pk,
+            "d_day": d_day
         },
         status=status.HTTP_200_OK)
         

@@ -1,5 +1,6 @@
 # 데이터 처리
 from .models import *
+from debates.models import *
 from .serializers import *
 
 # APIView 사용
@@ -14,7 +15,7 @@ from rest_framework import permissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # 공공 api 활용
-from .utils import call_national_assembly_api
+from .utils import *
 from .pagination import CustomResultsSetPagination
 
 
@@ -48,7 +49,8 @@ class PetitionListAPIView(APIView):
                 'BILL_NAME': item['BILL_NAME'],
                 'PROPOSER': item['PROPOSER'],
                 'PROPOSER_DT': item['PROPOSER_DT'],
-                'content': item.get('petition_file', {}).get('content', '')
+                'content': item.get('petition_file', {}).get('content', ''),
+                "days": ""
             })
         return filtered_data
     
