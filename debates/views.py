@@ -15,7 +15,7 @@ from rest_framework import permissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # 기타 계산 관련
-from datetime import timedelta, datetime
+from datetime import timedelta
 from .utils import *
 
 
@@ -28,7 +28,7 @@ class DebateCreateAPIView(APIView):
         petition_id = request.query_params.get('BILL_NO')
         if not petition_id:
             return Response({
-                "error": "청원 번호(BILL_NO)가 제공되지 않았습니다."
+                "error": "잘못된 url 입니다. parameter를 작성해주세요."
             }, status=status.HTTP_400_BAD_REQUEST)
             
         try:
@@ -62,19 +62,13 @@ class DebateCreateAPIView(APIView):
             debate_code_X=debate_code_X
         )
         
-        # 디데이 계산
-        current_date = datetime.now().date()
-        d_day = (debate.debate_date - current_date).days
-        
-        
         res = Response({
             "member_announcement_date": debate.member_announcement_date,
             "debate_date": debate.debate_date,
             "estimated_time": debate.estimated_time,
             "debate_code_O": debate.debate_code_O,
             "debate_code_X": debate.debate_code_X,
-            "petition_id": debate.petition_id.pk,
-            "d_day": d_day
+            "petition_id": debate.petition_id.pk
         },
         status=status.HTTP_200_OK)
         

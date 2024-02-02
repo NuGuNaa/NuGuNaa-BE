@@ -18,6 +18,9 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from .utils import *
 from .pagination import CustomResultsSetPagination
 
+# 기타 계산
+from datetime import datetime
+
 
 # 청원 리스트 보여주기
 class PetitionListAPIView(APIView):
@@ -43,14 +46,23 @@ class PetitionListAPIView(APIView):
     
     def filtering_data(self, data):
         filtered_data = []
+        current_date = datetime.now().date()
             
         for item in data:
+            petition_id = item['BILL_NO']
+            
+            try:
+                debate = Debate.objects.get(petition_id=petition_id)
+                d_day = (debate.debate_date.date() - current_date).days
+            except Debate.DoesNotExist:
+                d_day = "N/A"
+            
             filtered_data.append({
                 'BILL_NAME': item['BILL_NAME'],
                 'PROPOSER': item['PROPOSER'],
                 'PROPOSER_DT': item['PROPOSER_DT'],
                 'content': item.get('petition_file', {}).get('content', ''),
-                "days": ""
+                "d_day": d_day
             })
         return filtered_data
     
