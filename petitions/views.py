@@ -85,7 +85,8 @@ class PetitionDetailAPIView(APIView):
             petition_detail = Petition_Detail.objects.get(BILL_NO=bill_no)
             petition_file = Petition_File.objects.get(BILL_NO=bill_no)
             
-            data = {
+            # 청원 상세 정보
+            petition_data = {
                 'BILL_NAME': petition.BILL_NAME,
                 'PROPOSER': petition.PROPOSER,
                 'APPROVER': petition_detail.APPROVER,
@@ -96,7 +97,28 @@ class PetitionDetailAPIView(APIView):
                 'content': petition_file.content,
                 'petition_file_url': petition_file.petition_file_url
             }
-            return Response(data, status=status.HTTP_200_OK)
+            
+            # 토론 정보 
+            debate_data = {}
+            try:
+                debate = Debate.objects.get(petition_id=bill_no)
+                debate_data = {
+                    'member_announcement_date': debate.member_announcement_date,
+                    'debate_date': debate.debate_date,
+                    'estimated_time': debate.estimated_time,
+                    'debate_code_O': debate.debate_code_O,
+                    'debate_code_X': debate.debate_code_X
+                }
+            except Debate.DoesNotExist:
+                debate_data = "토론이 아직 생성되지 않았습니다."
+            
+            # 최종 응답 데이터
+            response_data = {
+                'petition': petition_data,
+                'debate': debate_data
+            }
+            
+            return Response(response_data, status=status.HTTP_200_OK)
         
         except (Petition.DoesNotExist, Petition_Detail.DoesNotExist, Petition_File.DoesNotExist):
             return Response({
