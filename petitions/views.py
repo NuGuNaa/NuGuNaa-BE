@@ -58,6 +58,7 @@ class PetitionListAPIView(APIView):
                 d_day = "N/A"
             
             filtered_data.append({
+                'BILL_NO': item['BILL_NO'],
                 'BILL_NAME': item['BILL_NAME'],
                 'PROPOSER': item['PROPOSER'],
                 'PROPOSER_DT': item['PROPOSER_DT'],
@@ -87,6 +88,7 @@ class PetitionDetailAPIView(APIView):
             
             # 청원 상세 정보
             petition_data = {
+                'BILL_NO': petition.BILL_NO,
                 'BILL_NAME': petition.BILL_NAME,
                 'PROPOSER': petition.PROPOSER,
                 'APPROVER': petition_detail.APPROVER,
