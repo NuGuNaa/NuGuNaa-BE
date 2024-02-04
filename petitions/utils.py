@@ -124,7 +124,10 @@ def save_api_data_to_db(api_data, endpoint):
         )
         
         # Petition_File 모델 업데이트 또는 생성
-        save_file_path(item['BILL_NO'])
+        if created:
+            save_file_path(item['BILL_NO'])
+        else:
+            Petition_File.objects.get(BILL_NO=petition)
 
 
 # api에서 데이터 읽어오기
