@@ -92,7 +92,7 @@ def save_file_path(bill_no):
                 defaults={'petition_file_url': url}
             )
  
-            if created:
+            if created or not petition_file.content:
                 content_value = find_and_extract_text_from_pdf_file(petition_instance, directory_path)
                 Petition_File.objects.filter(BILL_NO=petition_instance).update(content=content_value)
             break
