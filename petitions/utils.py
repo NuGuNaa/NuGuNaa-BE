@@ -96,6 +96,7 @@ def save_file_path(bill_no):
                 content_value = find_and_extract_text_from_pdf_file(petition_instance, directory_path)
                 Petition_File.objects.filter(BILL_NO=petition_instance).update(content=content_value)
             break
+        time.sleep(0.1)
         
 
 # api 응답 데이터 db에 저장
