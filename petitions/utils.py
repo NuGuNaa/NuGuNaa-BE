@@ -87,23 +87,22 @@ def save_file_path(bill_no):
     for url in file_urls:
         url = url.strip()
         if str(bill_no) in url:
-            petition_file, created = Petition_File.objects.update_or_create(
+            petition_file, created = Petition_File.objects.get_or_create(
                 BILL_NO=petition_instance,
                 defaults={'petition_file_url': url}
             )
-            
-            if not petition_file.content:
+ 
+            if created:
                 content_value = find_and_extract_text_from_pdf_file(petition_instance, directory_path)
                 Petition_File.objects.filter(BILL_NO=petition_instance).update(content=content_value)
             break
-        time.sleep(1)
         
 
 # api 응답 데이터 db에 저장
 def save_api_data_to_db(api_data, endpoint):
     for item in api_data[endpoint][1]['row']:
         # Petition 모델 업데이트 또는 생성
-        petition, created = Petition.objects.update_or_create(
+        petition, created = Petition.objects.get_or_create(
             BILL_NO = item['BILL_NO'],
             defaults={
                 'BILL_NAME': item['BILL_NAME'],
@@ -114,7 +113,7 @@ def save_api_data_to_db(api_data, endpoint):
         )
         
         # Petition_Detail 모델 업데이트 또는 생성
-        Petition_Detail.objects.update_or_create(
+        Petition_Detail.objects.get_or_create(
             BILL_NO = petition,
             defaults={
                 'APPROVER': item['APPROVER'],
