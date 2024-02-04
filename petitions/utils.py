@@ -8,26 +8,96 @@ from django.conf import settings
 from .models import *
 from django.utils.dateparse import parse_date
 
-# url 찾기
+
+# 파일 관련
+import PyPDF2
+import openai
+import time
 from .file_urls import file_urls
+
+openai.api_key = settings.OPENAI_APIKEY
+
+
+# chat gpt에 파일 text를 입력하여 요약 받기
+def get_chatgpt_summary(filename, text):
+    prompt = f"{filename}의 내용: {text}"
+    user_content = [
+        {
+            "role": "Please summary the context in 1 sentence in Korean.",
+            "role": "assistant",
+            "content": "이 청원은 무엇에 관한 것입니다.",
+            "role": "user",
+            "content": f"Please summary {prompt} context easily and shortly in 1 sentence in Korean. \
+                You must not exceed the reply in 1 sentence. \
+                Take a deep breath and proceed with confidence."
+        }
+    ]
+    
+    message_to_send = [
+        {
+            "role": "system",
+            "content": "You are an expert at summarizing received texts. \
+                There's a text included in the prompt that needs to be condensed \
+                so people can easily understand it. \
+                You must summarize the all context in 1 sentences. Do not exceed 1 sentence. \
+                Your response must be in Korean, without exception. \
+                Take a deep breath and proceed with confidence."
+        }
+    ]
+    message_to_send.extend(user_content)
+    
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        temperature=1.0,
+        max_tokens=200,
+        messages=message_to_send
+    )
+    
+    chatgpt_response = response['choices'][0]['message']['content']
+
+    return chatgpt_response
+    
+
+# files 목록에서 해당 청원 원본 파일 찾기
+def find_and_extract_text_from_pdf_file(petition_instance, directory_path):
+    text = ""
+    bill_no = petition_instance.BILL_NO
+    file_path = None
+    
+    for filename in os.listdir(directory_path):
+        if str(bill_no) in filename:
+            print(filename)
+            file_path = directory_path + filename
+            break
+    
+    with open(file_path, 'rb') as file:
+        pdf = PyPDF2.PdfReader(file)
+        for page in pdf.pages:
+            text += page.extract_text()
+    chatgpt_summary = get_chatgpt_summary(filename, text)
+    
+    return chatgpt_summary
 
 
 # petition_file 파일 경로 확인
 def save_file_path(bill_no):
     petition_instance = Petition.objects.get(BILL_NO=bill_no)
+    directory_path = 'files/'
     
     for url in file_urls:
         url = url.strip()
         if str(bill_no) in url:
-            Petition_File.objects.update_or_create(
+            petition_file, created = Petition_File.objects.update_or_create(
                 BILL_NO=petition_instance,
                 defaults={'petition_file_url': url}
             )
+            
+            if not petition_file.content:
+                content_value = find_and_extract_text_from_pdf_file(petition_instance, directory_path)
+                Petition_File.objects.filter(BILL_NO=petition_instance).update(content=content_value)
             break
+        time.sleep(1)
         
-
-# content 다운로드 받은 파일의 요약을 chat gpt에게 생성해달라 요청
-
 
 # api 응답 데이터 db에 저장
 def save_api_data_to_db(api_data, endpoint):

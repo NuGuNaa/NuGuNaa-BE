@@ -23,6 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 PUBLIC_API_KEY = os.getenv("PUBLIC_API_KEY")
+OPENAI_APIKEY = os.getenv("OPENAI_APIKEY")
 
 
 # Quick-start development settings - unsuitable for production
