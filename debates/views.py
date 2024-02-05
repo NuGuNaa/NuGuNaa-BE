@@ -140,7 +140,7 @@ class UserDebateAPIView(APIView):
             bill_name=F('petition_id__BILL_NAME'),
             debate_code_O=F('petition_id__debate__debate_code_O'),
             debate_code_X=F('petition_id__debate__debate_code_X')
-        ).values('bill_name', 'debate_code_O', 'debate_code_X', 'raffle_check')
+        ).values('bill_name', 'position', 'debate_code_O', 'debate_code_X', 'raffle_check')
         
         # 결과 데이터 구성
         result_data = {
