@@ -18,6 +18,3 @@ class Debate_Apply(models.Model):
     petition_id = models.ForeignKey(Petition, null=False, blank=False, on_delete=models.CASCADE)
     email = models.ForeignKey(User, null=True, blank=False, on_delete=models.CASCADE)
     position = models.IntegerField(null=True, blank=False) # 찬성: 0, 반대: 1
-    
-    def __str__(self):
-        return self.petition_id

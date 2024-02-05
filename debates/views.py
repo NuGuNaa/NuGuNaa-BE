@@ -19,7 +19,7 @@ from datetime import timedelta
 from .utils import *
 
 
-# 토론 기본 정보 등록하기(백엔드에서 미리 작업)
+# 토론 기본 정보 등록하기(서버에서만 처리 - 관리자용)
 class DebateCreateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]
@@ -73,3 +73,14 @@ class DebateCreateAPIView(APIView):
         status=status.HTTP_200_OK)
         
         return res
+    
+    
+# 토론 신청한 사람 추첨하기(서버에서만 처리 - 관리자용)
+class RandomDebateApplyView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    
+    def post(self, request):
+        random_debates = Debate_Apply.objects.order_by('?')[:2]
+        serializer = DebateApplySerializer(random_debates, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

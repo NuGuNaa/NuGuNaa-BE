@@ -8,7 +8,6 @@ from django.conf import settings
 from .models import *
 from django.utils.dateparse import parse_date
 
-
 # 파일 관련
 import PyPDF2
 import openai
