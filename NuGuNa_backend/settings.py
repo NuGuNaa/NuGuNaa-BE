@@ -24,6 +24,8 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 PUBLIC_API_KEY = os.getenv("PUBLIC_API_KEY")
 OPENAI_APIKEY = os.getenv("OPENAI_APIKEY")
+ID = os.getenv("NAVER_ID")
+PASSWORD = os.getenv("NAVER_PASSWORD")
 
 
 # Quick-start development settings - unsuitable for production

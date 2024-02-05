@@ -106,5 +106,20 @@ class RandomDebateApplyView(APIView):
         user_ids = [apply.email.id for apply in selected_applies]
         User.objects.filter(id__in=user_ids).update(petition_id=petition_id)
         
+        # Debate_Apply raffle_check 업데이트
+        # 랜덤으로 추첨된 항목들의 raffle_check를 True로 설정
+        for apply in selected_applies:
+            apply.raffle_check = True
+            apply.save()
+            
+        # 추첨되지 않은 나머지 항목들의 raffle_check를 False로 설정   
+        # petition_id와 position이 일치하는데, selected_applies에 포함되지 않은 항목을 찾기
+        Debate_Apply.objects.filter(
+            petition_id=petition_id, 
+            position=position
+        ).exclude(
+            id__in=[apply.id for apply in selected_applies]
+        ).update(raffle_check=False) 
+            
         serializer = DebateApplySerializer(selected_applies, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
