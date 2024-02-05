@@ -109,17 +109,27 @@ class RandomDebateApplyView(APIView):
         # Debate_Apply raffle_check 업데이트
         # 랜덤으로 추첨된 항목들의 raffle_check를 True로 설정
         for apply in selected_applies:
-            apply.raffle_check = True
-            apply.save()
+            if position == '0':
+                apply.raffle_check = True
+                apply.save()
+            elif position == '1':
+                apply.raffle_check = False
+                apply.save()
+            else:
+            # 유효하지 않은 position 값에 대한 처리
+                response = {
+                    "error": "유효하지 않은 position 값입니다."
+                }
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
             
         # 추첨되지 않은 나머지 항목들의 raffle_check를 False로 설정   
         # petition_id와 position이 일치하는데, selected_applies에 포함되지 않은 항목을 찾기
-        Debate_Apply.objects.filter(
-            petition_id=petition_id, 
-            position=position
-        ).exclude(
-            id__in=[apply.id for apply in selected_applies]
-        ).update(raffle_check=False) 
+        # Debate_Apply.objects.filter(
+        #     petition_id=petition_id, 
+        #     position=position
+        # ).exclude(
+        #     id__in=[apply.id for apply in selected_applies]
+        # ).update(raffle_check=False) 
             
         serializer = DebateApplySerializer(selected_applies, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
