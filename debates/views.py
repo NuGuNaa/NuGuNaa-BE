@@ -2,6 +2,7 @@
 from .models import *
 from petitions.models import *
 from .serializers import *
+from django.db.models import F
 
 # APIView 사용
 from rest_framework.views import APIView
@@ -123,3 +124,27 @@ class RandomDebateApplyView(APIView):
             
         serializer = DebateApplySerializer(selected_applies, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
+# 사용자 신청 내역 확인하기
+class UserDebateAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    
+    def get(self, request):
+        user_email = request.GET.get('email')
+        user = User.objects.get(email=user_email)
+
+        # 해당 사용자의 모든 토론 신청 정보를 가져오기.
+        applications = Debate_Apply.objects.filter(email=user).select_related('petition_id').annotate(
+            bill_name=F('petition_id__BILL_NAME'),
+            debate_code_O=F('petition_id__debate__debate_code_O'),
+            debate_code_X=F('petition_id__debate__debate_code_X')
+        ).values('bill_name', 'debate_code_O', 'debate_code_X', 'raffle_check')
+        
+        # 결과 데이터 구성
+        result_data = {
+            "results": list(applications)
+        }
+
+        return Response(result_data, status=status.HTTP_200_OK)
