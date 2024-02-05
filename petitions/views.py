@@ -2,6 +2,7 @@
 from .models import *
 from debates.models import *
 from .serializers import *
+from debates.serializers import *
 
 # APIView 사용
 from rest_framework.views import APIView
@@ -9,6 +10,7 @@ from rest_framework.views import APIView
 # Response 관련
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 
 # 인증 관련
 from rest_framework import permissions
@@ -127,3 +129,25 @@ class PetitionDetailAPIView(APIView):
                 "error": "청원을 찾을 수 없습니다."
             },
             status=status.HTTP_404_NOT_FOUND)
+            
+# 사용자들이 토론 참여 신청하기    
+    def post(self, request):        
+        petition_id = request.GET.get('BILL_NO', None)
+        email = request.data.get('email', None)
+        user = User.objects.get(email=email)
+        
+        data = request.data.copy()
+        data['petition_id'] = petition_id
+        
+        serializer = DebateApplySerializer(data=data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            
+            response_data = {
+                'petition_id': petition_id,
+                'email': user.email,
+                'position': serializer.data['position']
+            }
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
