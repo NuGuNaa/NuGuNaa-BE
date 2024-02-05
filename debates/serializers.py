@@ -10,7 +10,7 @@ class DebateSerializer(serializers.ModelSerializer):
         
         
 class DebateApplySerializer(serializers.ModelSerializer):                   
-    email = serializers.EmailField(write_only=True)
+    email = serializers.EmailField()
     
     class Meta:
         model = Debate_Apply

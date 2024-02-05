@@ -145,7 +145,8 @@ class PetitionDetailAPIView(APIView):
             
             response_data = {
                 'petition_id': petition_id,
-                'email': user.email,
+                # 'email': user.email,
+                'email': serializer.data['email'],
                 'position': serializer.data['position']
             }
             

@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 # Response 관련
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 
 # 인증 관련
 from rest_framework import permissions
@@ -80,7 +81,30 @@ class RandomDebateApplyView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     
-    def post(self, request):
-        random_debates = Debate_Apply.objects.order_by('?')[:2]
-        serializer = DebateApplySerializer(random_debates, many=True)
+    def get(self, request):        
+        petition_id = request.GET.get('BILL_NO')
+        position = request.GET.get('position')
+        
+        # 각 토론에서 찬성/반대 구분하여 사람 리스트 확인
+        if petition_id is not None and position is not None:
+            debate_applies = Debate_Apply.objects.filter(petition_id=petition_id, position=position)
+        else:
+            response = {
+                "error": "잘못된 url 입니다. parameter를 작성해주세요."
+            }
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            
+        # 랜덤으로 2명 뽑기
+        if debate_applies.count() > 2:
+            selected_applies = random.sample(list(debate_applies), 2)
+        elif debate_applies.count() > 0:
+            selected_applies = list(debate_applies)
+        else:
+            selected_applies = []
+            
+        # User petition_id 업데이트
+        user_ids = [apply.email.id for apply in selected_applies]
+        User.objects.filter(id__in=user_ids).update(petition_id=petition_id)
+        
+        serializer = DebateApplySerializer(selected_applies, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
