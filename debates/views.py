@@ -163,13 +163,11 @@ class DebateStatementAPIView(APIView):
             status=status.HTTP_400_BAD_REQUEST)
         
         debate = Debate.objects.get(petition_id=petition_id)
-        debate_statement = Debate_Statement.objects.get(debate_id=debate)
         user = request.user
         
         # 현재 로그인한 사용자의 발언을 조회
         user_statements = Debate_Statement.objects.filter(
             debate_id=debate,
-            statement_type=debate_statement.statement_type,
             statement_user__user_email=user
         ).distinct()
 
@@ -199,7 +197,7 @@ class DebateStatementAPIView(APIView):
         position = request.GET.get('position')
         type = request.GET.get('type')
         
-        if not petition_id or not position:
+        if not petition_id or not position or not type:
             return Response({
             "error": "잘못된 url 입니다. parameter를 작성해주세요."
             },
@@ -242,14 +240,22 @@ class StatementSummaryAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     
     # chat gpt에 입력된 내용 묶어서 전달하기
-    def post(self, request):
+    def get(self, request):
         petition_id = request.GET.get('BILL_NO')
         position = request.GET.get('position')
+        type = request.GET.get('type')
         
-        if not petition_id or not position:
+        if not petition_id or not position or not type:
             return Response({
             "error": "잘못된 url 입니다. parameter를 작성해주세요."
             },
             status=status.HTTP_400_BAD_REQUEST)
             
+        statements = Debate_Statement.objects.filter(
+            statement_type=type,
+            is_chatgpt=False
+        ).values('id', 'statement_type', 'content', 'is_chatgpt')
         
+        send_to_chatgpt
+        
+        return Response(list(statements), status=status.HTTP_200_OK)

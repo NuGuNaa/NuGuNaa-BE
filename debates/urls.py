@@ -7,4 +7,5 @@ urlpatterns = [
     path("raffle", RandomDebateApplyView.as_view()),
     path("apply", UserDebateAPIView.as_view()),
     path("statement", DebateStatementAPIView.as_view()),
+    path("summary", StatementSummaryAPIView.as_view()),
 ]
