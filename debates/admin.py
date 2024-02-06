@@ -8,7 +8,12 @@ class DebateCheck(admin.ModelAdmin):
 
 class DebateApplyCheck(admin.ModelAdmin):
     list_display = ('id', 'petition_id', 'email', 'position', 'raffle_check')
+    
+
+class DebateStatementCheck(admin.ModelAdmin):
+    list_display = ('debate_id', 'statement_type', 'content', 'is_chatgpt', 'position')
+    
 
 admin.site.register(Debate, DebateCheck)
 admin.site.register(Debate_Apply, DebateApplyCheck)
-admin.site.register(Debate_Statement)
+admin.site.register(Debate_Statement, DebateStatementCheck)

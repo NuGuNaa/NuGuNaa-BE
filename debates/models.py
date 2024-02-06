@@ -27,7 +27,7 @@ class Debate_Statement(models.Model):
     statement_type = models.CharField(max_length=20, null=False, blank=False)
     content = models.TextField()
     is_chatgpt = models.BooleanField(default=False, null=False, blank=False)
-    position = models.BooleanField(null=True)
+    position = models.IntegerField(null=True, blank=False) # 찬성: 0, 반대: 1
     
     
 class Statement_User(models.Model):
