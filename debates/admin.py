@@ -13,7 +13,12 @@ class DebateApplyCheck(admin.ModelAdmin):
 class DebateStatementCheck(admin.ModelAdmin):
     list_display = ('debate_id', 'statement_type', 'content', 'is_chatgpt', 'position')
     
+    
+class StatementUserCheck(admin.ModelAdmin):
+    list_display = ('id', 'statement_id', 'user_email')
+
 
 admin.site.register(Debate, DebateCheck)
 admin.site.register(Debate_Apply, DebateApplyCheck)
 admin.site.register(Debate_Statement, DebateStatementCheck)
+admin.site.register(Statement_User, StatementUserCheck)
