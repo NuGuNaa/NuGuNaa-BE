@@ -151,7 +151,7 @@ class DebateStatementAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     
-    # 채팅 불러오기
+    # 토론 불러오기
     def get(self, request):
         petition_id = request.GET.get('BILL_NO')
         position = request.GET.get('position')
@@ -163,10 +163,72 @@ class DebateStatementAPIView(APIView):
             status=status.HTTP_400_BAD_REQUEST)
         
         debate = Debate.objects.get(petition_id=petition_id)
-        user_email = request.user.email
+        # debate_statement = Debate_Statement.objects.get(debate_id=debate.id)
+        # statement_user = Statement_User.objects.get(statement_id=debate_statement.id)
+        user = request.user
+        
+        # 현재 로그인한 사용자의 발언을 조회
+        user_statements = Debate_Statement.objects.filter(
+            debate_id=debate,
+            statement_user__user_email=user
+        ).distinct()
 
-        statements = Debate_Statement.objects.filter(
-            Q(statement_user__user_email__email=user_email) | Q(is_chatgpt=True),
-            debate_id=debate
-        ).distinct().values('id', 'content', 'is_chatgpt', 'statement_user__user_email__email')
-        return Response(statements, status=status.HTTP_200_OK)
+        # ChatGPT의 답변을 조회
+        chatgpt_statements = Debate_Statement.objects.filter(
+            debate_id=debate,
+            is_chatgpt=True
+        ).distinct()
+
+        # 두 쿼리셋의 결과를 Python 리스트로 결합
+        statements = list(user_statements) + list(chatgpt_statements)
+
+        response_data = [
+            {
+                "id": statement.id,
+                "content": statement.content,
+                "is_chatgpt": statement.is_chatgpt,
+                "email": user.email if not statement.is_chatgpt else "ChatGPT"
+            } for statement in statements
+        ]
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    # 토론 입력하기(사용자)
+    def post(self, request):
+        petition_id = request.GET.get('BILL_NO')
+        position = request.GET.get('position')
+        
+        if not petition_id or not position:
+            return Response({
+            "error": "잘못된 url 입니다. parameter를 작성해주세요."
+            },
+            status=status.HTTP_400_BAD_REQUEST)
+            
+        content = request.data.get('content')
+        
+        if content is None:
+            return Response({"error": "내용을 입력해주세요."})
+        
+        debate = Debate.objects.get(petition_id=petition_id)
+        user = request.user
+        
+        debate_statement = Debate_Statement.objects.create(
+            debate_id=debate,
+            content=content,
+            is_chatgpt=False,  # 사용자가 입력한 내용
+            position=position
+        )
+                
+        Statement_User.objects.create(
+            statement_id=debate_statement,
+            user_email=user
+        )
+        
+        response_data = {
+            "statement_id": debate_statement.id,
+            "content": debate_statement.content,
+            "is_chatgpt": debate_statement.is_chatgpt,
+            "email": user.email
+        }
+        
+        return Response(response_data, status=status.HTTP_201_CREATED)
+        
