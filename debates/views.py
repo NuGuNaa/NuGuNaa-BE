@@ -240,7 +240,7 @@ class StatementSummaryAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     
     # chat gpt에 입력된 내용 묶어서 전달하기
-    def get(self, request):
+    def post(self, request):
         petition_id = request.GET.get('BILL_NO')
         position = request.GET.get('position')
         type = request.GET.get('type')
@@ -256,6 +256,22 @@ class StatementSummaryAPIView(APIView):
             is_chatgpt=False
         ).values('id', 'statement_type', 'content', 'is_chatgpt')
         
-        send_to_chatgpt
+        chatgpt_response = send_to_chatgpt(statements, position)
         
-        return Response(list(statements), status=status.HTTP_200_OK)
+        debate = get_object_or_404(Debate, petition_id=petition_id)
+        debate_statement = Debate_Statement.objects.create(
+            debate_id = debate,
+            content = chatgpt_response,
+            is_chatgpt = True,
+            statement_type = type,
+            position = position
+        )
+        
+        return Response({
+            "id": debate_statement.id,
+            "statement_type": debate_statement.statement_type,
+            "position": debate_statement.position,
+            "content": debate_statement.content,
+            "is_chatgpt": debate_statement.is_chatgpt
+        },
+        status=status.HTTP_200_OK)

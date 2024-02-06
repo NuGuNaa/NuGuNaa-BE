@@ -22,7 +22,8 @@ def get_chatgpt_summary(filename, text):
     prompt = f"{filename}의 내용: {text}"
     user_content = [
         {
-            "role": "Please summary the context in 1 sentence in Korean.",
+            "role": "user",
+            "content": "Please summary the context in 1 sentence in Korean.",
             "role": "assistant",
             "content": "이 청원은 무엇에 관한 것입니다.",
             "role": "user",
