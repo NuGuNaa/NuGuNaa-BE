@@ -255,6 +255,7 @@ class StatementSummaryAPIView(APIView):
             status=status.HTTP_400_BAD_REQUEST)
             
         statements = Debate_Statement.objects.filter(
+            petition_id=petition_id,
             statement_type=type,
             position=position,
             is_chatgpt=False
