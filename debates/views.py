@@ -229,6 +229,7 @@ class DebateStatementAPIView(APIView):
             "statement_id": debate_statement.id,
             "content": debate_statement.content,
             "is_chatgpt": debate_statement.is_chatgpt,
+            "statement_type": debate_statement.statement_type,
             "email": user.email
         }
         
