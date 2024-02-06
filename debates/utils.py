@@ -32,11 +32,11 @@ def get_type_of_value(statement_type):
     return type_map.get(statement_type)
 
 def get_meaning_of_position(position):
-    type_map = {
+    position_map = {
         '0': '찬성',
         '1': '반대'
     }
-    return type_map.get(position)
+    return position_map.get(position)
       
 
 # chat gpt에 전송하기        
@@ -55,6 +55,7 @@ def send_to_chatgpt(statements, position):
         message = f"{statement_type_value}: {content}"
         messages.append(message)
         messages.append("\n")
+        type = ""
         
     prompt = "".join(messages)
     user_content = [

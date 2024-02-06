@@ -168,7 +168,9 @@ class DebateStatementAPIView(APIView):
         # 현재 로그인한 사용자의 발언을 조회
         user_statements = Debate_Statement.objects.filter(
             debate_id=debate,
-            statement_user__user_email=user
+            statement_user__user_email=user,
+            position=position,
+            is_chatgpt=False,
         ).distinct()
 
         # ChatGPT의 답변을 조회
@@ -183,6 +185,7 @@ class DebateStatementAPIView(APIView):
         response_data = [
             {
                 "id": statement.id,
+                "position": statement.position,
                 "content": statement.content,
                 "statement_type": statement.statement_type,
                 "is_chatgpt": statement.is_chatgpt,
@@ -253,8 +256,9 @@ class StatementSummaryAPIView(APIView):
             
         statements = Debate_Statement.objects.filter(
             statement_type=type,
+            position=position,
             is_chatgpt=False
-        ).values('id', 'statement_type', 'content', 'is_chatgpt')
+        ).values('id', 'statement_type', 'content', 'is_chatgpt', 'position')
         
         chatgpt_response = send_to_chatgpt(statements, position)
         
