@@ -254,8 +254,10 @@ class StatementSummaryAPIView(APIView):
             },
             status=status.HTTP_400_BAD_REQUEST)
             
+        debate = get_object_or_404(Debate, petition_id=petition_id)
+            
         statements = Debate_Statement.objects.filter(
-            petition_id=petition_id,
+            debate_id=debate.id,
             statement_type=type,
             position=position,
             is_chatgpt=False
