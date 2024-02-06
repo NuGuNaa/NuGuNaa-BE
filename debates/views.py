@@ -163,13 +163,13 @@ class DebateStatementAPIView(APIView):
             status=status.HTTP_400_BAD_REQUEST)
         
         debate = Debate.objects.get(petition_id=petition_id)
-        # debate_statement = Debate_Statement.objects.get(debate_id=debate.id)
-        # statement_user = Statement_User.objects.get(statement_id=debate_statement.id)
+        debate_statement = Debate_Statement.objects.get(debate_id=debate)
         user = request.user
         
         # 현재 로그인한 사용자의 발언을 조회
         user_statements = Debate_Statement.objects.filter(
             debate_id=debate,
+            statement_type=debate_statement.statement_type,
             statement_user__user_email=user
         ).distinct()
 
@@ -186,6 +186,7 @@ class DebateStatementAPIView(APIView):
             {
                 "id": statement.id,
                 "content": statement.content,
+                "statement_type": statement.statement_type,
                 "is_chatgpt": statement.is_chatgpt,
                 "email": user.email if not statement.is_chatgpt else "ChatGPT"
             } for statement in statements
