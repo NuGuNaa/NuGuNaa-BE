@@ -104,8 +104,8 @@ class RandomDebateApplyView(APIView):
             selected_applies = []
             
         # User petition_id 업데이트
-        user_ids = [apply.email.id for apply in selected_applies]
-        User.objects.filter(id__in=user_ids).update(petition_id=petition_id)
+        # user_ids = [apply.email.id for apply in selected_applies]
+        # User.objects.filter(id__in=user_ids).update(petition_id=petition_id)
         
         # Debate_Apply raffle_check 업데이트
         # 랜덤으로 추첨된 항목들의 raffle_check를 True로 설정
