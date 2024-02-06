@@ -28,3 +28,9 @@ class Debate_Statement(models.Model):
     content = models.TextField()
     is_chatgpt = models.BooleanField(default=False, null=False, blank=False)
     position = models.BooleanField(null=True)
+    
+    
+class Statement_User(models.Model):
+    id = models.AutoField(primary_key=True, null=False, blank=False)
+    statement_id = models.ForeignKey(Debate_Statement, null=False, blank=False, on_delete=models.CASCADE)
+    user_email = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)

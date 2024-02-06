@@ -11,3 +11,4 @@ class DebateApplyCheck(admin.ModelAdmin):
 
 admin.site.register(Debate, DebateCheck)
 admin.site.register(Debate_Apply, DebateApplyCheck)
+admin.site.register(Debate_Statement)

@@ -2,7 +2,7 @@
 from .models import *
 from petitions.models import *
 from .serializers import *
-from django.db.models import F
+from django.db.models import F, Q
 
 # APIView 사용
 from rest_framework.views import APIView
@@ -154,6 +154,19 @@ class DebateStatementAPIView(APIView):
     # 채팅 불러오기
     def get(self, request):
         petition_id = request.GET.get('BILL_NO')
-        statement_type = request.GET.get('type')
+        position = request.GET.get('position')
         
+        if not petition_id or not position:
+            return Response({
+            "error": "잘못된 url 입니다. parameter를 작성해주세요."
+            },
+            status=status.HTTP_400_BAD_REQUEST)
         
+        debate = Debate.objects.get(petition_id=petition_id)
+        user_email = request.user.email
+
+        statements = Debate_Statement.objects.filter(
+            Q(statement_user__user_email__email=user_email) | Q(is_chatgpt=True),
+            debate_id=debate
+        ).distinct().values('id', 'content', 'is_chatgpt', 'statement_user__user_email__email')
+        return Response(statements, status=status.HTTP_200_OK)
