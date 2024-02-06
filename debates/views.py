@@ -102,10 +102,6 @@ class RandomDebateApplyView(APIView):
             selected_applies = list(debate_applies)
         else:
             selected_applies = []
-            
-        # User petition_id 업데이트
-        # user_ids = [apply.email.id for apply in selected_applies]
-        # User.objects.filter(id__in=user_ids).update(petition_id=petition_id)
         
         # Debate_Apply raffle_check 업데이트
         # 랜덤으로 추첨된 항목들의 raffle_check를 True로 설정
@@ -148,3 +144,16 @@ class UserDebateAPIView(APIView):
         }
 
         return Response(result_data, status=status.HTTP_200_OK)
+    
+    
+# 토론 진행 상황 확인하기
+class DebateStatementAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    
+    # 채팅 불러오기
+    def get(self, request):
+        petition_id = request.GET.get('BILL_NO')
+        statement_type = request.GET.get('type')
+        
+        

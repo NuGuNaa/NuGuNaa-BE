@@ -25,3 +25,9 @@ class DebateApplySerializer(serializers.ModelSerializer):
             **validated_data
         )
         return debate_apply_instance
+    
+    
+class DebateStatementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Debate_Statement
+        fields = '__all__'

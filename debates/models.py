@@ -19,3 +19,12 @@ class Debate_Apply(models.Model):
     email = models.ForeignKey(User, null=True, blank=False, on_delete=models.CASCADE)
     position = models.IntegerField(null=True, blank=False) # 찬성: 0, 반대: 1
     raffle_check = models.BooleanField(null=True, blank=False) # 추첨됐는지 확인
+    
+    
+class Debate_Statement(models.Model):
+    id = models.AutoField(primary_key=True, null=False, blank=False)
+    debate_id = models.ForeignKey(Debate, null=False, blank=False, on_delete=models.CASCADE)
+    statement_type = models.CharField(max_length=20, null=False, blank=False)
+    content = models.TextField()
+    is_chatgpt = models.BooleanField(default=False, null=False, blank=False)
+    position = models.BooleanField(null=True)

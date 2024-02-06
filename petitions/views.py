@@ -76,7 +76,7 @@ class PetitionDetailAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     
     def get(self, request):
-        bill_no = request.query_params.get('BILL_NO')
+        bill_no = request.GET.get('BILL_NO')
         if not bill_no:
             return Response({
                 "error": "잘못된 url 입니다. parameter를 작성해주세요."
