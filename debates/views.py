@@ -282,3 +282,22 @@ class StatementSummaryAPIView(APIView):
             "is_chatgpt": debate_statement.is_chatgpt
         },
         status=status.HTTP_200_OK)
+        
+    # 전체 내용 요약하기
+    def get(self, request):
+        petition_id = request.GET.get('BILL_NO')
+        
+        if not petition_id:
+            return Response({
+            "error": "잘못된 url 입니다. parameter를 작성해주세요."
+            },
+            status=status.HTTP_400_BAD_REQUEST)
+            
+        debate = get_object_or_404(Debate, petition_id=petition_id)
+        
+        statements = Debate_Statement.objects.filter(
+            debate_id=debate.id,
+            is_chatgpt=True
+        ).values('id', 'statement_type', 'content', 'is_chatgpt', 'position')
+        
+        return Response(list(statements), status=status.HTTP_200_OK)
