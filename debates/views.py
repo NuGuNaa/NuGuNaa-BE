@@ -174,13 +174,25 @@ class DebateStatementAPIView(APIView):
         ).distinct()
 
         # ChatGPT의 답변을 조회
-        chatgpt_statements = Debate_Statement.objects.filter(
-            debate_id=debate,
-            is_chatgpt=True
-        ).distinct()
-
+        # chatgpt_statements = Debate_Statement.objects.filter(
+        #     debate_id=debate,
+        #     is_chatgpt=True
+        # ).distinct()
+        opposite_position = "1" if position == "0" else "0"
+        chatgpt_statements = []
+        for statement_type in Debate_Statement.objects.values_list('statement_type', flat=True).distinct():
+            first_statement = Debate_Statement.objects.filter(
+                debate_id=debate,
+                is_chatgpt=True,
+                position=opposite_position,
+                statement_type=statement_type
+            ).order_by('id').first()
+            if first_statement:
+                chatgpt_statements.append(first_statement)     
+        
         # 두 쿼리셋의 결과를 Python 리스트로 결합
-        statements = list(user_statements) + list(chatgpt_statements)
+        # statements = list(user_statements) + list(chatgpt_statements)
+        statements = list(user_statements) + chatgpt_statements
 
         response_data = [
             {
