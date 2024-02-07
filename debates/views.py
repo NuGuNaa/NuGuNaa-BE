@@ -185,9 +185,10 @@ class DebateStatementAPIView(APIView):
                 debate_id=debate,
                 is_chatgpt=True,
                 position=opposite_position,
+                statement_type=statement_type
             ).order_by('id').first()
             if first_statement:
-                chatgpt_statements.append(first_statement)        
+                chatgpt_statements.append(first_statement)     
         
         # 두 쿼리셋의 결과를 Python 리스트로 결합
         # statements = list(user_statements) + list(chatgpt_statements)
