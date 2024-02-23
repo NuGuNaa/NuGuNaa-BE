@@ -33,7 +33,7 @@ class PetitionListAPIView(APIView):
         endpoint = "nvqbafvaajdiqhehi"
         call_national_assembly_api(endpoint)
         
-        petitions = Petition.objects.all()
+        petitions = Petition.objects.all().order_by('-BILL_NO')
         paginator = CustomResultsSetPagination()
         page = paginator.paginate_queryset(petitions, request, view=self)
         
