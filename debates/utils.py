@@ -93,3 +93,9 @@ def send_to_chatgpt(statements, position):
     chatgpt_response = response['choices'][0]['message']['content']
     
     return chatgpt_response
+
+
+# Python에서 position 0과 1의 리스트를 번갈아가며 결합
+def interleave_lists(list1, list2):
+    """두 리스트의 요소를 번갈아가며 결합"""
+    return [val for pair in zip(list1, list2) for val in pair]

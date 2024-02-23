@@ -286,9 +286,21 @@ class StatementSummaryAPIView(APIView):
             
         debate = get_object_or_404(Debate, petition_id=petition_id)
         
-        statements = Debate_Statement.objects.filter(
-            debate_id=debate.id,
-            is_chatgpt=True
-        ).values('id', 'statement_type', 'content', 'is_chatgpt', 'position')
+        # statements = Debate_Statement.objects.filter(
+        #     debate_id=debate.id,
+        #     is_chatgpt=True
+        # ).values('id', 'statement_type', 'content', 'is_chatgpt', 'position')
         
-        return Response(list(statements), status=status.HTTP_200_OK)
+        # position 값에 따라 분리하여 쿼리
+        statements_0 = Debate_Statement.objects.filter(
+            debate_id=debate.id, is_chatgpt=True, position="0"
+        ).order_by('id').values('id', 'statement_type', 'content', 'is_chatgpt', 'position')
+
+        statements_1 = Debate_Statement.objects.filter(
+            debate_id=debate.id, is_chatgpt=True, position="1"
+        ).order_by('id').values('id', 'statement_type', 'content', 'is_chatgpt', 'position')
+
+        # Python에서 position 0과 1의 리스트를 번갈아가며 결합
+        interleaved_statements = interleave_lists(list(statements_0), list(statements_1))
+
+        return Response(interleaved_statements, status=status.HTTP_200_OK)
