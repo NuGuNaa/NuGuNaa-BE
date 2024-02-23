@@ -165,34 +165,13 @@ class DebateStatementAPIView(APIView):
         debate = Debate.objects.get(petition_id=petition_id)
         user = request.user
         
-        # 현재 로그인한 사용자의 발언을 조회
-        user_statements = Debate_Statement.objects.filter(
-            debate_id=debate,
-            statement_user__user_email=user,
-            position=position,
-            is_chatgpt=False,
-        ).distinct()
-
-        # ChatGPT의 답변을 조회
-        # chatgpt_statements = Debate_Statement.objects.filter(
-        #     debate_id=debate,
-        #     is_chatgpt=True
-        # ).distinct()
-        opposite_position = "1" if position == "0" else "0"
-        chatgpt_statements = []
-        for statement_type in Debate_Statement.objects.values_list('statement_type', flat=True).distinct():
-            first_statement = Debate_Statement.objects.filter(
-                debate_id=debate,
-                is_chatgpt=True,
-                position=opposite_position,
-                statement_type=statement_type
-            ).order_by('id').first()
-            if first_statement:
-                chatgpt_statements.append(first_statement)     
+        # 현재 로그인한 사용자의 발언과 ChatGPT의 발언을 포함하는 쿼리셋 생성
+        # Q 객체를 사용하여 여러 조건을 OR 연산으로 결합
+        statements = Debate_Statement.objects.filter(
+            Q(debate_id=debate, statement_user__user_email=user, is_chatgpt=False, position=position) |
+            Q(debate_id=debate, is_chatgpt=True, position="1" if position == "0" else "0"),
+        ).order_by('id')  # id를 기준으로 오름차순으로 정렬
         
-        # 두 쿼리셋의 결과를 Python 리스트로 결합
-        # statements = list(user_statements) + list(chatgpt_statements)
-        statements = list(user_statements) + chatgpt_statements
 
         response_data = [
             {
