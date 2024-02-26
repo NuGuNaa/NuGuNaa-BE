@@ -2,7 +2,7 @@
 from .models import *
 from petitions.models import *
 from .serializers import *
-from django.db.models import F, Q
+from django.db.models import F, Q, Max
 
 # APIView 사용
 from rest_framework.views import APIView
@@ -171,18 +171,38 @@ class DebateStatementAPIView(APIView):
             Q(debate_id=debate, statement_user__user_email=user, is_chatgpt=False, position=position) |
             Q(debate_id=debate, is_chatgpt=True, position="1" if position == "0" else "0"),
         ).order_by('id')  # id를 기준으로 오름차순으로 정렬
-        
 
-        response_data = [
-            {
+        # response_data = [
+        #     {
+        #         "id": statement.id,
+        #         "position": statement.position,
+        #         "content": statement.content,
+        #         "statement_type": statement.statement_type,
+        #         "is_chatgpt": statement.is_chatgpt,
+        #         "email": user.email if not statement.is_chatgpt else "ChatGPT"
+        #     } for statement in statements
+        # ]
+        # return Response(response_data, status=status.HTTP_200_OK)
+        
+        # ChatGPT의 각 position에 대한 최신 답장만 필터링
+        latest_chatgpt_statements_ids = Debate_Statement.objects.filter(
+            debate_id=debate, is_chatgpt=True
+        ).values('position').annotate(latest_id=Max('id')).values_list('latest_id', flat=True)
+
+        # 최종 응답 데이터 구성
+        response_data = []
+        for statement in statements:
+            if statement.is_chatgpt and statement.id not in latest_chatgpt_statements_ids:
+                continue  # ChatGPT의 최신 답장이 아니면 제외
+            response_data.append({
                 "id": statement.id,
                 "position": statement.position,
                 "content": statement.content,
                 "statement_type": statement.statement_type,
                 "is_chatgpt": statement.is_chatgpt,
-                "email": user.email if not statement.is_chatgpt else "ChatGPT"
-            } for statement in statements
-        ]
+                "email": request.user.email if not statement.is_chatgpt else "ChatGPT"
+            })
+            
         return Response(response_data, status=status.HTTP_200_OK)
     
     # 토론 입력하기(사용자)
