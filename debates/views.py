@@ -169,14 +169,15 @@ class DebateStatementAPIView(APIView):
         latest_chatgpt_ids_subquery = Debate_Statement.objects.filter(
             debate_id=OuterRef('debate_id'), 
             statement_type=OuterRef('statement_type'), 
-            is_chatgpt=True
+            is_chatgpt=True,
+            position="0" if position == "1" else "1"  # 사용자의 position과 반대되는 position을 대상으로 함
         ).order_by('-id').values('id')[:1]
         
         # 현재 로그인한 사용자의 발언과 ChatGPT의 발언을 포함하는 쿼리셋 생성
         # Q 객체를 사용하여 여러 조건을 OR 연산으로 결합
         statements = Debate_Statement.objects.filter(
             Q(debate_id=debate, statement_user__user_email=user, is_chatgpt=False, position=position) |
-            Q(debate_id=debate, is_chatgpt=True, id__in=Subquery(latest_chatgpt_ids_subquery), position="1" if position == "0" else "0"),
+            Q(debate_id=debate, is_chatgpt=True, id__in=Subquery(latest_chatgpt_ids_subquery)),
         ).order_by('id')  # id를 기준으로 오름차순으로 정렬
 
         response_data = [
