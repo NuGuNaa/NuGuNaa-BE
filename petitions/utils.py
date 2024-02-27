@@ -103,7 +103,7 @@ def save_file_path(bill_no):
 def save_api_data_to_db(api_data, endpoint):
     for item in api_data[endpoint][1]['row']:
         # Petition 모델 업데이트 또는 생성
-        petition, created = Petition.objects.update_or_create( # 만약 청원이 추가될 경우, update_or_update로 수정
+        petition, created = Petition.objects.get_or_create( # 만약 청원이 추가될 경우, update_or_update로 수정
             BILL_NO = item['BILL_NO'],
             defaults={
                 'BILL_NAME': item['BILL_NAME'],
@@ -114,7 +114,7 @@ def save_api_data_to_db(api_data, endpoint):
         )
         
         # Petition_Detail 모델 업데이트 또는 생성
-        Petition_Detail.objects.update_or_create( # 만약 청원이 추가될 경우, update_or_update로 수정
+        Petition_Detail.objects.get_or_create( # 만약 청원이 추가될 경우, update_or_update로 수정
             BILL_NO = petition,
             defaults={
                 'APPROVER': item['APPROVER'],
@@ -124,13 +124,21 @@ def save_api_data_to_db(api_data, endpoint):
         )
         
         # Petition_File 모델 업데이트 또는 생성
-        # if created:
-        #     save_file_path(item['BILL_NO'])
-        # else:
-        #     Petition_File.objects.get(BILL_NO=petition)
+        if created:
+            save_file_path(item['BILL_NO'])
+        else:
+            Petition_File.objects.get(BILL_NO=petition)
         
         # 청원이 새로 추가된 경우
-        save_file_path(item['BILL_NO'])
+        # save_file_path(item['BILL_NO'])
+        
+        ### 청원 추가시 하는 활동
+        # 1. petitions utils.py에서 get_or_create -> update_or_create
+        # 2. save_file_path(item['BILL_NO'])로 수정
+        # 3. file_urls.py에 올라온 청원 파일 aws s3에 올리고 링크 받아서 추가하기
+        # 4. postman에서 청원 리스트 업데이트
+        # 5. postman에서 청원 관련 토론 생성
+        # 6. utils.py 코드 다시 돌려놓기
 
 
 # api에서 데이터 읽어오기
