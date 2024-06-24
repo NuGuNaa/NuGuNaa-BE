@@ -103,7 +103,7 @@ def save_file_path(bill_no):
 def save_api_data_to_db(api_data, endpoint):
     for item in api_data[endpoint][1]['row']:
         # Petition 모델 업데이트 또는 생성
-        petition, created = Petition.objects.get_or_create( # 만약 청원이 추가될 경우, update_or_update로 수정
+        petition, created = Petition.objects.update_or_create( # 만약 청원이 추가될 경우, update_or_update로 수정
             BILL_NO = item['BILL_NO'],
             defaults={
                 'BILL_NAME': item['BILL_NAME'],
