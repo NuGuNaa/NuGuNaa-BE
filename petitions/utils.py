@@ -114,7 +114,7 @@ def save_api_data_to_db(api_data, endpoint):
         )
         
         # Petition_Detail 모델 업데이트 또는 생성
-        Petition_Detail.objects.get_or_create( # 만약 청원이 추가될 경우, update_or_update로 수정
+        Petition_Detail.objects.update_or_create( # 만약 청원이 추가될 경우, update_or_update로 수정
             BILL_NO = petition,
             defaults={
                 'APPROVER': item['APPROVER'],
@@ -124,13 +124,13 @@ def save_api_data_to_db(api_data, endpoint):
         )
         
         # Petition_File 모델 업데이트 또는 생성
-        if created:
-            save_file_path(item['BILL_NO'])
-        else:
-            Petition_File.objects.get(BILL_NO=petition)
+        # if created:
+        #     save_file_path(item['BILL_NO'])
+        # else:
+        #     Petition_File.objects.get(BILL_NO=petition)
         
         # 청원이 새로 추가된 경우
-        # save_file_path(item['BILL_NO'])
+        save_file_path(item['BILL_NO'])
         
         ### 청원 추가시 하는 활동
         # 1. petitions utils.py에서 get_or_create -> update_or_create
